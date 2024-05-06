@@ -30,7 +30,7 @@ const Layout = ({ cardCount, setCardCount, isButtonClicked, checkedBoxes }) => {
       setCardCount(csvData.length); //set card count to length of csvData
       setCompanyFieldValues([companyValues]);
     }
-  }, [csvData]);
+  }, []);
 
   const handleCompanyDetailsCheckbox = useCallback((e) => {
     setApplyCompanyToAll(e.target.checked);
@@ -62,11 +62,11 @@ const Layout = ({ cardCount, setCardCount, isButtonClicked, checkedBoxes }) => {
               onClose={() => setIsModalOpen(false)}
               companyFieldValues={companyFieldValues}
               personalFieldValues={personalFieldValues}
-              applyCompanyToAll={applyCompanyToAll}
-              cardCount={cardCount}
-              cardData={csvData}
               personalFields={personalFields}
               companyFields={companyFields}
+              cardCount={cardCount}
+              applyCompanyToAll={applyCompanyToAll}
+              cardData={csvData}
               setCsvData={setCsvData}
             />
           </div>

@@ -136,7 +136,6 @@ const CardDetails = ({
                 ))}
               </div>
             )}
-            {/**/}
 
             {index !== 0 && applyCompanyToAll && (
               <div>
@@ -145,7 +144,7 @@ const CardDetails = ({
                 ))}
               </div>
             )}
-            {/**/}
+
             {index === 0 && cardCount > 1 && companyFields.length > 0 && (
               <div className="company-container">
                 <input

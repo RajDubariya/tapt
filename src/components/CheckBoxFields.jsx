@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import { fields } from "../../utils/fields";
-import Input from "../UI/Input";
+import { fields } from "../utils/fields";
+import Input from "./UI/Input";
 
 const CheckBoxFields = ({ checkedBoxes, handleCheckBox }) => {
   const personalFieldsArray = Object.entries(fields.personal).map(

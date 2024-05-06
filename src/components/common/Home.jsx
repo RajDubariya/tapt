@@ -1,7 +1,7 @@
 import { useState } from "react";
-import Layout from "./Layout";
-import Footer from "./common/Footer";
-import CheckBoxFields from "./common/CheckBoxFields";
+import Layout from "../Layout";
+import Footer from "./Footer";
+import CheckBoxFields from "../CheckBoxFields";
 
 const Home = () => {
   const [checkedBoxes, setCheckedBoxes] = useState([]);
