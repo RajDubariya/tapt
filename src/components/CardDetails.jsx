@@ -1,124 +1,167 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { fields } from "../utils/fields";
+import { populateInputFields } from "../utils/csv";
 
 const CardDetails = ({
   applyCompanyToAll,
   handleCompanyDetailsCheckbox,
-  handleChange,
-  companyFieldValues,
-  personalFieldValues,
-  index,
-  cardData,
   personalFields,
   companyFields,
   cardCount,
+  cardData,
+  companyFieldValues,
+  personalFieldValues,
+  setCompanyFieldValues,
+  setPersonalFieldValues,
 }) => {
-  const [inputValues, setInputValues] = useState({
-    personalValues: {},
-    companyValues: {},
-  });
+  const [inputValues, setInputValues] = useState({});
 
-  const companyFieldValue = companyFieldValues[index] || {};
-  const personalFieldValue = personalFieldValues[index] || {};
-
-  const populateInputFields = (data) => {
-    const personalValues = {};
-    const companyValues = {};
-    Object.keys(data).forEach((key) => {
-      if (key in fields.personal) {
-        personalValues[key] = data[key];
-      } else if (key in fields.company) {
-        companyValues[key] = data[key];
+  useEffect(() => {
+    setCompanyFieldValues((prevValues) => {
+      if (cardCount < prevValues.length) {
+        return prevValues.slice(0, cardCount);
+      } else if (cardCount > prevValues.length) {
+        return [
+          ...prevValues,
+          ...Array(cardCount - prevValues.length).fill({}),
+        ];
+      } else {
+        return prevValues;
       }
     });
-    return { personalValues, companyValues };
-  };
+
+    setPersonalFieldValues((prevValues) => {
+      if (cardCount < prevValues.length) {
+        return prevValues.slice(0, cardCount);
+      } else if (cardCount > prevValues.length) {
+        return [
+          ...prevValues,
+          ...Array(cardCount - prevValues.length).fill({}),
+        ];
+      } else {
+        return prevValues;
+      }
+    });
+  }, [cardCount]);
 
   useEffect(() => {
     if (cardData) {
-      const inputData = cardData.find((data) => data.id == index);
-      if (inputData) {
-        const newInputValues = populateInputFields(inputData);
-        setInputValues(newInputValues);
-      }
+      cardData.forEach((data, index) => {
+        const inputValues = populateInputFields(data);
+        setInputValues((prev) => ({
+          ...prev,
+          [index]: inputValues,
+        }));
+      });
     }
-  }, [cardData, index]);
+  }, [cardData]);
+
+  const handleCompanyChange = (e, fieldName, cardIndex) => {
+    setCompanyFieldValues((prevValues) => {
+      const updatedValues = [...prevValues];
+      updatedValues[cardIndex] = {
+        ...updatedValues[cardIndex],
+        [fieldName]: e.target.value,
+      };
+      return updatedValues;
+    });
+  };
+
+  const handlePersonalChange = (e, fieldName, cardIndex) => {
+    setPersonalFieldValues((prevValues) => {
+      const updatedValues = [...prevValues];
+      updatedValues[cardIndex] = {
+        ...updatedValues[cardIndex],
+        [fieldName]: e.target.value,
+      };
+      return updatedValues;
+    });
+  };
 
   return (
     <>
-      <div className="card">
-        {personalFields.length > 0 && (
-          <div>
-            <h2>Personal Information</h2>
-            {personalFields.map((checkedBox) => (
-              <div key={checkedBox} className="card-details">
-                <label htmlFor={checkedBox}>
-                  {fields.personal[checkedBox].placeholder}
-                </label>
-                <input
-                  type={fields.personal[checkedBox].type}
-                  name={checkedBox}
-                  id={checkedBox}
-                  defaultValue={
-                    cardData
-                      ? inputValues.personalValues[checkedBox]
-                      : personalFieldValue[checkedBox] || ""
-                  }
-                  // value={personalFieldValue[checkedBox] || ""}
-                  onChange={(e) => handleChange(e, checkedBox, "personal")}
-                />
+      <div className="card-container">
+        {Array.from({ length: cardCount }).map((_, index) => (
+          <div className="card" key={index}>
+            {personalFields.length > 0 && (
+              <div>
+                <h2>Personal Information</h2>
+                {personalFields.map((field) => (
+                  <div key={field} className="card-details">
+                    <label htmlFor={field}>
+                      {fields.personal[field].placeholder}
+                    </label>
+                    <input
+                      type={fields.personal[field].type}
+                      name={field}
+                      id={field}
+                      defaultValue={
+                        cardData
+                          ? inputValues[index]?.personalValues[field]
+                          : (personalFieldValues[index] &&
+                              personalFieldValues[index][field]) ||
+                            ""
+                      }
+                      onChange={(e) => handlePersonalChange(e, field, index)}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        )}
-        {companyFields.length > 0 && <h2>Company Information</h2>}
-        {(index === 0 || (!applyCompanyToAll && companyFields.length > 0)) && (
-          <div>
-            {companyFields.map((checkedBox) => (
-              <div key={checkedBox} className="card-details">
-                <label htmlFor={checkedBox}>
-                  {fields.company[checkedBox].placeholder}
-                </label>
-                <input
-                  type={fields.company[checkedBox].type}
-                  name={checkedBox}
-                  id={checkedBox}
-                  // value={companyFieldValue[checkedBox] || ""}
-                  defaultValue={
-                    cardData
-                      ? inputValues.companyValues[checkedBox]
-                      : companyFieldValue[checkedBox] || ""
-                  }
-                  onChange={(e) => handleChange(e, checkedBox, "company")}
-                />
+            )}
+
+            {companyFields.length > 0 && <h2>Company Information</h2>}
+            {(index === 0 ||
+              (companyFields.length > 0 && !applyCompanyToAll)) && (
+              <div>
+                {companyFields.map((field) => (
+                  <div key={field} className="card-details">
+                    <label htmlFor={field}>
+                      {fields.company[field].placeholder}
+                    </label>
+                    <input
+                      type={fields.company[field].type}
+                      name={field}
+                      id={field}
+                      defaultValue={
+                        cardData
+                          ? inputValues[index]?.companyValues[field]
+                          : (companyFieldValues[index] &&
+                              companyFieldValues[index][field]) ||
+                            ""
+                      }
+                      onChange={(e) => handleCompanyChange(e, field, index)}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+            {/**/}
+
+            {index !== 0 && applyCompanyToAll && (
+              <div>
+                {companyFields.map((fieldName, index) => (
+                  <div key={index}>{companyFieldValues[0][fieldName]}</div>
+                ))}
+              </div>
+            )}
+            {/**/}
+            {index === 0 && cardCount > 1 && companyFields.length > 0 && (
+              <div className="company-container">
+                <input
+                  type="checkbox"
+                  name="companyDetails"
+                  id="companyDetails"
+                  onChange={(e) => handleCompanyDetailsCheckbox(e)}
+                  checked={applyCompanyToAll}
+                />
+                <label htmlFor="companyDetails">
+                  Apply company information to all cards
+                </label>
+              </div>
+            )}
           </div>
-        )}
-        {/**/}
-        {index !== 0 && applyCompanyToAll && (
-          <div>
-            {companyFields.map((fieldName, index) => (
-              <div key={index}>{companyFieldValues[0][fieldName]}</div>
-            ))}
-          </div>
-        )}
-        {/**/}
-        {index === 0 && cardCount > 1 && companyFields.length > 0 && (
-          <div className="company-container">
-            <input
-              type="checkbox"
-              name="companyDetails"
-              id="companyDetails"
-              onChange={handleCompanyDetailsCheckbox}
-              checked={applyCompanyToAll}
-            />
-            <label htmlFor="companyDetails">
-              Apply company information to all cards
-            </label>
-          </div>
-        )}
+        ))}
       </div>
     </>
   );

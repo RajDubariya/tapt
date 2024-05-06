@@ -6,10 +6,6 @@ const Footer = ({
   cardCount,
   setCardCount,
 }) => {
-  const handleClick = () => {
-    handleButtonClick();
-  };
-
   const increase = () => {
     setCardCount((prev) => prev + 1);
   };
@@ -17,13 +13,17 @@ const Footer = ({
     setCardCount((prev) => prev - 1);
   };
 
-  const handleChange = (e) => {
-    setCardCount(e.target.value);
+  const handleCardCount = (value) => {
+    setCardCount(value);
   };
 
   return (
     <div className="container">
-      <button onClick={handleClick} className="btn" disabled={!isButtonClicked}>
+      <button
+        onClick={handleButtonClick}
+        className="btn"
+        disabled={!isButtonClicked}
+      >
         Back
       </button>
       <div>
@@ -34,7 +34,7 @@ const Footer = ({
           type="number"
           step={1}
           value={cardCount}
-          onChange={(e) => handleChange(e)}
+          onChange={(e) => handleCardCount(e.target.value)}
           min={1}
         />
         <button className="btn" onClick={increase}>

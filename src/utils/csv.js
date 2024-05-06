@@ -1,3 +1,5 @@
+import { fields } from "./fields";
+
 export const convertArrayToCsv = (dataArray) => {
   const header = Object.keys(dataArray[0]).join(",") + "\n";
   const rows = dataArray.map((row) => Object.values(row).join(",")).join("\n");
@@ -25,4 +27,17 @@ export const parseCsv = (text, setData) => {
     data.push(rowObject);
   }
   setData(data);
+};
+
+export const populateInputFields = (data) => {
+  const personalValues = {};
+  const companyValues = {};
+  Object.keys(data).forEach((key) => {
+    if (key in fields.personal) {
+      personalValues[key] = data[key];
+    } else if (key in fields.company) {
+      companyValues[key] = data[key];
+    }
+  });
+  return { personalValues, companyValues };
 };

@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useRef } from "react";
 import ReactDOM from "react-dom";
-import { convertArrayToCsv } from "../utils/csv";
+import { convertArrayToCsv, parseCsv } from "../utils/csv";
 
 const Csv = ({
   isOpen,
@@ -10,16 +10,13 @@ const Csv = ({
   companyFieldValues,
   applyCompanyToAll,
   cardCount,
-  children,
   cardData,
   personalFields,
   companyFields,
+  setCsvData,
 }) => {
   const modalRef = useRef();
-
-  const handleClose = () => {
-    onClose();
-  };
+  const fileInputRef = useRef(null);
 
   const handleOverlayClick = (e) => {
     if (modalRef.current === e.target) {
@@ -79,6 +76,22 @@ const Csv = ({
     }
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = event.target.result;
+        parseCsv(text, setCsvData);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const handleFileButtonClick = () => {
+    fileInputRef.current.click();
+  };
+
   return isOpen
     ? ReactDOM.createPortal(
         <div
@@ -91,9 +104,18 @@ const Csv = ({
               <button className="btn" onClick={exportCsv}>
                 Export CSV
               </button>
-              {children}
+              <button className="btn" onClick={handleFileButtonClick}>
+                Import CSV
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".csv"
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+              />
             </div>
-            <button className="modal-close btn" onClick={handleClose}>
+            <button className="modal-close btn" onClick={() => onClose()}>
               Close
             </button>
           </div>

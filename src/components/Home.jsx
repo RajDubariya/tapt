@@ -1,43 +1,47 @@
-/* eslint-disable react/prop-types */
-import { fields } from "../utils/fields";
-import Input from "./Input";
+import { useState } from "react";
+import Layout from "./Layout";
+import Footer from "./common/Footer";
+import CheckBoxFields from "./common/CheckBoxFields";
 
-const Home = ({ handleCheckBox, checkedBoxes }) => {
-  const personalFieldsArray = Object.entries(fields.personal).map(
-    ([name, { type, placeholder }]) => ({
-      name,
-      type,
-      placeholder,
-    })
-  );
-  const companyFieldsArray = Object.entries(fields.company).map(
-    ([name, { type, placeholder }]) => ({
-      name,
-      type,
-      placeholder,
-    })
-  );
+const Home = () => {
+  const [checkedBoxes, setCheckedBoxes] = useState([]);
+  const [cardCount, setCardCount] = useState(1);
 
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
+
+  const handleButtonClick = () => {
+    setIsButtonClicked((prev) => !prev);
+  };
+
+  const handleCheckBox = (e) => {
+    const { checked, name } = e.target;
+    if (checked) {
+      setCheckedBoxes((prev) => [...prev, name]);
+    } else {
+      setCheckedBoxes((prev) => prev.filter((item) => item !== name));
+    }
+  };
   return (
     <>
-      {personalFieldsArray.map((field, index) => (
-        <Input
-          key={index}
-          name={field.name}
-          title={field.placeholder}
+      <Layout
+        cardCount={cardCount}
+        setCardCount={setCardCount}
+        isButtonClicked={isButtonClicked}
+        checkedBoxes={checkedBoxes}
+      />
+      {!isButtonClicked && (
+        <CheckBoxFields
+          checkedBoxes={checkedBoxes}
           handleCheckBox={handleCheckBox}
-          isChecked={checkedBoxes.includes(field.name)}
         />
-      ))}
-      {companyFieldsArray.map((field, index) => (
-        <Input
-          key={index}
-          name={field.name}
-          title={field.placeholder}
-          handleCheckBox={handleCheckBox}
-          isChecked={checkedBoxes.includes(field.name)}
-        />
-      ))}
+      )}
+      <Footer
+        checkedBoxes={checkedBoxes}
+        cardCount={cardCount}
+        setCardCount={setCardCount}
+        isButtonClicked={isButtonClicked}
+        handleButtonClick={handleButtonClick}
+      />
     </>
   );
 };
